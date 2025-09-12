@@ -10,7 +10,7 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "postinstall": "prisma generate && if [ \"$NODE_ENV\" = \"production\" ]; then prisma db push; fi"
+    "postinstall": "prisma generate"
   },
   "keywords": ["telegram", "bot", "miniapp", "reviews"],
   "author": "",

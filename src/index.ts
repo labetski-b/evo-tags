@@ -29,6 +29,22 @@ async function startServer() {
     await prisma.$connect();
     console.log('✅ Connected to database');
     
+    // Create tables if they don't exist (production only)
+    if (process.env.NODE_ENV === 'production') {
+      console.log('🔄 Ensuring database schema is up to date...');
+      try {
+        // Try a simple query first to check if tables exist
+        await prisma.user.findFirst();
+        console.log('✅ Database schema is ready');
+      } catch (error) {
+        // If tables don't exist, run db push
+        console.log('📋 Creating database tables...');
+        const { execSync } = require('child_process');
+        execSync('npx prisma db push', { stdio: 'inherit' });
+        console.log('✅ Database schema created');
+      }
+    }
+    
     app.listen(port, () => {
       console.log(`🚀 Server running on port ${port}`);
     });
