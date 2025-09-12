@@ -35,7 +35,7 @@ export function initBot(prisma: PrismaClient) {
           photoUrl = `https://api.telegram.org/file/bot${token}/${fileInfo.file_path}`;
         }
       } catch (photoError) {
-        console.log('Could not get user photo:', photoError.message);
+        console.log('Could not get user photo:', photoError instanceof Error ? photoError.message : 'Unknown error');
       }
 
       // Создаем или обновляем пользователя в базе
