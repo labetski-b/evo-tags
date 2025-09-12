@@ -10,10 +10,14 @@ interface TelegramUser {
 
 export function validateTelegramWebAppData(telegramData: string): TelegramUser | null {
   try {
+    console.log('Validating Telegram data:', telegramData.substring(0, 100) + '...');
+    
     // В реальном приложении нужно валидировать подпись
     // Для упрощения пока просто парсим данные
     const urlParams = new URLSearchParams(telegramData);
     const userParam = urlParams.get('user');
+    
+    console.log('User param from URL:', userParam);
     
     if (!userParam) {
       console.error('No user data in Telegram data');
@@ -21,16 +25,19 @@ export function validateTelegramWebAppData(telegramData: string): TelegramUser |
     }
 
     const user = JSON.parse(decodeURIComponent(userParam));
+    console.log('Parsed user data:', user);
     
     // Базовая валидация структуры пользователя
     if (!user.id || !user.first_name) {
-      console.error('Invalid user data structure');
+      console.error('Invalid user data structure:', user);
       return null;
     }
 
+    console.log('User validation successful for ID:', user.id);
     return user;
   } catch (error) {
     console.error('Error parsing Telegram data:', error);
+    console.error('Telegram data was:', telegramData);
     return null;
   }
 }
