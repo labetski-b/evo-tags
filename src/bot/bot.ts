@@ -31,8 +31,8 @@ export function initBot(prisma: PrismaClient) {
         const userPhotos = await bot.getUserProfilePhotos(user.id, { limit: 1 });
         if (userPhotos.photos.length > 0) {
           const photo = userPhotos.photos[0][0]; // Берем первое фото в лучшем качестве
-          const fileInfo = await bot.getFile(photo.file_id);
-          photoUrl = `https://api.telegram.org/file/bot${token}/${fileInfo.file_path}`;
+          // Сохраняем ссылку на наш прокси-эндпоинт
+          photoUrl = `/api/media/telegram-photo/${photo.file_id}`;
         }
       } catch (photoError) {
         console.log('Could not get user photo:', photoError instanceof Error ? photoError.message : 'Unknown error');

@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { userRoutes } from './users';
 import { reviewRoutes } from './reviews';
 import { adminRoutes } from './admin';
+import { mediaRoutes } from './media';
 
 export function setupRoutes(app: Express, prisma: PrismaClient) {
   // API prefix
@@ -16,6 +17,9 @@ export function setupRoutes(app: Express, prisma: PrismaClient) {
   
   // Admin routes (only for development)
   app.use(`${apiPrefix}/admin`, adminRoutes(prisma));
+  
+  // Media proxy routes
+  app.use(`${apiPrefix}/media`, mediaRoutes());
   
   // Health check
   app.get(`${apiPrefix}/health`, (req, res) => {
