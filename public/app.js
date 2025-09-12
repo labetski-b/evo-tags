@@ -6,6 +6,9 @@ tg.expand();
 let currentUser = null;
 let users = [];
 let selectedUserId = null;
+let currentTab = 'all-users';
+let myReviews = [];
+let reviewStatuses = {};
 
 // API base URL
 const API_BASE = '/api';
@@ -23,6 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         showLoading(true);
         await loadUsers();
+        await loadCurrentUser();
+        setupTabNavigation();
         showLoading(false);
     } catch (error) {
         console.error('Initialization error:', error);
@@ -82,6 +87,7 @@ function renderUsers() {
         const initials = getInitials(fullName);
         
         userCard.innerHTML = `
+            ${getStatusBadge(user.id)}
             <div class="user-header">
                 <div class="user-avatar">
                     ${user.photoUrl ? 
@@ -109,6 +115,167 @@ function getInitials(name) {
         .join('')
         .toUpperCase()
         .substring(0, 2);
+}
+
+// Setup tab navigation
+function setupTabNavigation() {
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+}
+
+// Switch between tabs
+function switchTab(tabName) {
+    currentTab = tabName;
+    
+    // Update active tab
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+    
+    // Update active content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === tabName);
+    });
+    
+    // Load data for specific tab
+    if (tabName === 'about-me') {
+        loadMyReviews();
+    }
+}
+
+// Load current user data
+async function loadCurrentUser() {
+    try {
+        const telegramData = tg.initData;
+        if (!telegramData) {
+            console.warn('No Telegram data available');
+            return;
+        }
+
+        const response = await fetch(`${API_BASE}/users/me`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ telegramData })
+        });
+        
+        if (response.ok) {
+            currentUser = await response.json();
+            await loadReviewStatuses();
+        }
+    } catch (error) {
+        console.error('Error loading current user:', error);
+    }
+}
+
+// Load review statuses for all users
+async function loadReviewStatuses() {
+    if (!currentUser) return;
+    
+    try {
+        // Reset statuses
+        reviewStatuses = {};
+        
+        // Check which users I've reviewed
+        for (const user of users) {
+            if (user.id === currentUser.id) continue;
+            
+            const response = await fetch(`${API_BASE}/reviews/check`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    telegramData: tg.initData,
+                    targetUserId: user.id
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                reviewStatuses[user.id] = data.review ? 'reviewed' : 'pending';
+            }
+        }
+        
+        // Re-render users with status badges
+        renderUsers();
+    } catch (error) {
+        console.error('Error loading review statuses:', error);
+    }
+}
+
+// Load my reviews
+async function loadMyReviews() {
+    if (!currentUser) {
+        document.getElementById('myReviewsContainer').innerHTML = `
+            <div class="empty-state">
+                <h3>🔐 Требуется авторизация</h3>
+                <p>Войдите через Telegram чтобы увидеть отзывы о себе</p>
+            </div>
+        `;
+        return;
+    }
+    
+    try {
+        const reviews = currentUser.receivedReviews || [];
+        renderMyReviews(reviews);
+    } catch (error) {
+        console.error('Error loading my reviews:', error);
+        document.getElementById('myReviewsContainer').innerHTML = `
+            <div class="empty-state">
+                <h3>❌ Ошибка загрузки</h3>
+                <p>Не удалось загрузить отзывы</p>
+            </div>
+        `;
+    }
+}
+
+// Render my reviews
+function renderMyReviews(reviews) {
+    const container = document.getElementById('myReviewsContainer');
+    
+    if (reviews.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>🌟 Пока нет отзывов</h3>
+                <p>Когда коллеги оставят отзывы о вас, они появятся здесь</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = reviews.map(review => `
+        <div class="my-review-card">
+            <div class="review-from">Анонимный отзыв • ${new Date(review.createdAt).toLocaleDateString('ru-RU', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}</div>
+            
+            <div class="review-item">
+                <div class="review-question">💡 Таланты, силы, компетенции, темы:</div>
+                <div class="review-answer">${review.talentsAnswer}</div>
+                
+                <div class="review-question">🎯 Какого клиента бы привели:</div>
+                <div class="review-answer">${review.clientAnswer}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Get status badge for user
+function getStatusBadge(userId) {
+    if (!currentUser || userId === currentUser.id) return '';
+    
+    const status = reviewStatuses[userId];
+    if (status === 'reviewed') {
+        return '<div class="status-badge status-reviewed">✓</div>';
+    }
+    
+    return ''; // Убираем лишние метки
 }
 
 // Open user modal
