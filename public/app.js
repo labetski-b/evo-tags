@@ -83,7 +83,6 @@ function renderUsers() {
         userCard.onclick = () => openUserModal(user);
         
         const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
-        const username = user.username ? `@${user.username}` : '';
         const initials = getInitials(fullName);
         
         userCard.innerHTML = `
@@ -98,7 +97,6 @@ function renderUsers() {
                 </div>
                 <div class="user-info">
                     <h3>${fullName}</h3>
-                    ${username ? `<div class="username">${username}</div>` : ''}
                 </div>
             </div>
         `;
