@@ -139,6 +139,7 @@ function switchTab(tabName) {
     
     // Load data for specific tab
     if (tabName === 'about-me') {
+        // Всегда перезагружаем данные при переходе на вкладку "Про меня"
         loadMyReviews();
     }
 }
@@ -214,23 +215,16 @@ async function loadReviewStatuses() {
 async function loadMyReviews() {
     const container = document.getElementById('myReviewsContainer');
     
-    if (!currentUser) {
-        // Попробуем загрузить пользователя еще раз
-        await loadCurrentUser();
-        
-        if (!currentUser) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <h3>🌟 Пока нет отзывов</h3>
-                    <p>Когда коллеги оставят отзывы о вас, они появятся здесь</p>
-                </div>
-            `;
-            return;
-        }
-    }
+    // Показать загрузку
+    container.innerHTML = `
+        <div class="empty-state">
+            <h3>🔄 Обновление...</h3>
+            <p>Загружаем актуальные отзывы</p>
+        </div>
+    `;
     
     try {
-        // Загружаем свежие данные пользователя с отзывами
+        // Всегда загружаем свежие данные пользователя с отзывами
         const telegramData = tg.initData;
         if (!telegramData) {
             container.innerHTML = `
@@ -252,6 +246,7 @@ async function loadMyReviews() {
         
         if (response.ok) {
             const userData = await response.json();
+            currentUser = userData; // Обновляем текущего пользователя
             const reviews = userData.receivedReviews || [];
             renderMyReviews(reviews);
         } else {
@@ -452,6 +447,10 @@ async function submitReview(event) {
         
         // Reload reviews for the user
         await loadUserReviews(selectedUserId);
+        
+        // Update review statuses for all users
+        await loadReviewStatuses();
+        
         userModal.style.display = 'block';
         
         showLoading(false);
