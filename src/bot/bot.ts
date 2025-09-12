@@ -56,7 +56,7 @@ export function initBot(prisma: PrismaClient) {
             [
               {
                 text: '🌟 Открыть EVO Tags',
-                web_app: { url: webappUrl }
+                web_app: { url: webappUrl! }
               }
             ]
           ]
