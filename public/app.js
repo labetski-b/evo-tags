@@ -79,16 +79,36 @@ function renderUsers() {
         
         const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
         const username = user.username ? `@${user.username}` : '';
+        const initials = getInitials(fullName);
         
         userCard.innerHTML = `
-            <div class="user-info">
-                <h3>${fullName}</h3>
-                ${username ? `<div class="username">${username}</div>` : ''}
+            <div class="user-header">
+                <div class="user-avatar">
+                    ${user.photoUrl ? 
+                        `<img src="${user.photoUrl}" alt="${fullName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                         <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">${initials}</div>` :
+                        initials
+                    }
+                </div>
+                <div class="user-info">
+                    <h3>${fullName}</h3>
+                    ${username ? `<div class="username">${username}</div>` : ''}
+                </div>
             </div>
         `;
         
         userGrid.appendChild(userCard);
     });
+}
+
+// Get user initials for avatar fallback
+function getInitials(name) {
+    return name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
 }
 
 // Open user modal
@@ -127,19 +147,28 @@ function renderReviews(reviews) {
     const reviewsList = document.getElementById('reviewsList');
     
     if (reviews.length === 0) {
-        reviewsList.innerHTML = '<p>Пока нет отзывов об этом человеке</p>';
+        reviewsList.innerHTML = `
+            <div class="empty-state">
+                <h3>🌟 Пока нет отзывов</h3>
+                <p>Станьте первым, кто оставит отзыв об этом человеке!</p>
+            </div>
+        `;
         return;
     }
     
     reviewsList.innerHTML = reviews.map(review => `
         <div class="review-item">
-            <div class="review-question">Таланты, силы, компетенции, темы:</div>
+            <div class="review-question">💡 Таланты, силы, компетенции, темы:</div>
             <div class="review-answer">${review.talentsAnswer}</div>
             
-            <div class="review-question">Какого клиента бы привели:</div>
+            <div class="review-question">🎯 Какого клиента бы привели:</div>
             <div class="review-answer">${review.clientAnswer}</div>
             
-            <div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</div>
+            <div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}</div>
         </div>
     `).join('');
 }

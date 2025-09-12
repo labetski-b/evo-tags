@@ -14,6 +14,7 @@ export function userRoutes(prisma: PrismaClient) {
           username: true,
           firstName: true,
           lastName: true,
+          photoUrl: true,
           createdAt: true,
         },
         orderBy: {

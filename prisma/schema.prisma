@@ -16,6 +16,7 @@ model User {
   username   String?
   firstName  String   @map("first_name")
   lastName   String?  @map("last_name")
+  photoUrl   String?  @map("photo_url")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 

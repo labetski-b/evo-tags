@@ -25,6 +25,19 @@ export function initBot(prisma: PrismaClient) {
     if (!user) return;
 
     try {
+      // Получаем фото профиля пользователя
+      let photoUrl = null;
+      try {
+        const userPhotos = await bot.getUserProfilePhotos(user.id, { limit: 1 });
+        if (userPhotos.photos.length > 0) {
+          const photo = userPhotos.photos[0][0]; // Берем первое фото в лучшем качестве
+          const fileInfo = await bot.getFile(photo.file_id);
+          photoUrl = `https://api.telegram.org/file/bot${token}/${fileInfo.file_path}`;
+        }
+      } catch (photoError) {
+        console.log('Could not get user photo:', photoError.message);
+      }
+
       // Создаем или обновляем пользователя в базе
       await prisma.user.upsert({
         where: { telegramId: BigInt(user.id) },
@@ -33,11 +46,13 @@ export function initBot(prisma: PrismaClient) {
           username: user.username || null,
           firstName: user.first_name,
           lastName: user.last_name || null,
+          photoUrl,
         },
         update: {
           username: user.username || null,
           firstName: user.first_name,
           lastName: user.last_name || null,
+          photoUrl,
         },
       });
 
