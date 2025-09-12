@@ -32,18 +32,23 @@ export function userRoutes(prisma: PrismaClient) {
   // Получить данные текущего пользователя
   router.post('/me', async (req, res) => {
     try {
+      console.log('POST /users/me called');
       const { telegramData } = req.body;
       
       if (!telegramData) {
+        console.error('No telegramData provided');
         return res.status(400).json({ error: 'Telegram data required' });
       }
 
+      console.log('Validating Telegram data...');
       // Валидация данных от Telegram
       const userData = validateTelegramWebAppData(telegramData);
       if (!userData) {
+        console.error('Telegram data validation failed');
         return res.status(401).json({ error: 'Invalid Telegram data' });
       }
 
+      console.log('Looking for user with ID:', userData.id);
       const user = await prisma.user.findUnique({
         where: { telegramId: BigInt(userData.id) },
         include: {
@@ -59,9 +64,11 @@ export function userRoutes(prisma: PrismaClient) {
       });
 
       if (!user) {
+        console.error('User not found for ID:', userData.id);
         return res.status(404).json({ error: 'User not found' });
       }
 
+      console.log('User found with', user.receivedReviews.length, 'reviews');
       res.json(user);
     } catch (error) {
       console.error('Error fetching current user:', error);

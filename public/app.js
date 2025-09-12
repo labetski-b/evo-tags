@@ -269,7 +269,10 @@ async function loadMyReviews() {
     try {
         // Всегда загружаем свежие данные пользователя с отзывами
         const telegramData = tg.initData;
+        console.log('Loading my reviews with Telegram data:', telegramData ? 'present' : 'missing');
+        
         if (!telegramData) {
+            console.error('No Telegram init data available');
             container.innerHTML = `
                 <div class="empty-state">
                     <h3>⚠️ Данные недоступны</h3>
@@ -287,16 +290,22 @@ async function loadMyReviews() {
             body: JSON.stringify({ telegramData })
         });
         
+        console.log('My reviews API response status:', response.status);
+        
         if (response.ok) {
             const userData = await response.json();
+            console.log('My reviews loaded:', userData);
             currentUser = userData; // Обновляем текущего пользователя
             const reviews = userData.receivedReviews || [];
+            console.log('Found reviews:', reviews.length);
             renderMyReviews(reviews);
         } else {
+            const errorData = await response.text();
+            console.error('Failed to load my reviews:', response.status, errorData);
             container.innerHTML = `
                 <div class="empty-state">
                     <h3>❌ Ошибка загрузки</h3>
-                    <p>Не удалось загрузить отзывы</p>
+                    <p>Статус: ${response.status}. Попробуйте позже.</p>
                 </div>
             `;
         }
