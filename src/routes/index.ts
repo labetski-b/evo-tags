@@ -2,6 +2,7 @@ import { Express } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { userRoutes } from './users';
 import { reviewRoutes } from './reviews';
+import { adminRoutes } from './admin';
 
 export function setupRoutes(app: Express, prisma: PrismaClient) {
   // API prefix
@@ -12,6 +13,9 @@ export function setupRoutes(app: Express, prisma: PrismaClient) {
   
   // Review routes
   app.use(`${apiPrefix}/reviews`, reviewRoutes(prisma));
+  
+  // Admin routes (only for development)
+  app.use(`${apiPrefix}/admin`, adminRoutes(prisma));
   
   // Health check
   app.get(`${apiPrefix}/health`, (req, res) => {
