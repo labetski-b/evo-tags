@@ -51,12 +51,14 @@
         
         .user-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 1rem;
             margin-bottom: 2rem;
+            width: 100%;
+            max-width: 100%;
         }
         
-        @media (max-width: 480px) {
+        @media (max-width: 400px) {
             .user-grid {
                 grid-template-columns: 1fr;
             }
@@ -76,6 +78,8 @@
             flex-direction: column;
             justify-content: center;
             min-height: 100px;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .user-card::before {
