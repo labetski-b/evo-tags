@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EVO Tags</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -18,6 +18,10 @@
             color: var(--tg-theme-text-color, #1e293b);
             line-height: 1.6;
             min-height: 100vh;
+            touch-action: pan-x pan-y;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-text-size-adjust: none;
         }
         
         .container {

@@ -25,14 +25,43 @@ const successDiv = document.getElementById('success');
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         showLoading(true);
-        await loadCurrentUser(); // Сначала загружаем данные пользователя
-        await loadUsers(); // Потом загружаем всех пользователей
-        setupTabNavigation();
+        
+        // Timeout для защиты от зависания
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 10000)
+        );
+        
+        await Promise.race([
+            (async () => {
+                await loadCurrentUser(); // Сначала загружаем данные пользователя
+                await loadUsers(); // Потом загружаем всех пользователей
+                setupTabNavigation();
+            })(),
+            timeoutPromise
+        ]);
+        
         showLoading(false);
+        
+        // Если нет пользователей, показываем сообщение
+        if (users.length === 0) {
+            document.getElementById('userGrid').innerHTML = `
+                <div class="empty-state">
+                    <h3>👥 Пока никого нет</h3>
+                    <p>Участники появятся после регистрации в боте</p>
+                </div>
+            `;
+        }
+        
     } catch (error) {
         console.error('Initialization error:', error);
-        showError('Ошибка при загрузке данных');
+        showError(error.message === 'Timeout' ? 
+            'Долгая загрузка. Попробуйте перезапустить приложение' : 
+            'Ошибка при загрузке данных'
+        );
         showLoading(false);
+        
+        // Показываем базовый интерфейс даже при ошибке
+        setupTabNavigation();
     }
 });
 
