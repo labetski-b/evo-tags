@@ -149,6 +149,8 @@ function switchTab(tabName) {
 async function loadCurrentUser() {
     try {
         const telegramData = tg.initData;
+        console.log('Telegram init data:', telegramData); // Debug log
+        
         if (!telegramData) {
             console.warn('No Telegram data available');
             return;
@@ -164,7 +166,10 @@ async function loadCurrentUser() {
         
         if (response.ok) {
             currentUser = await response.json();
+            console.log('Current user loaded:', currentUser); // Debug log
             await loadReviewStatuses();
+        } else {
+            console.error('Failed to load current user:', response.status);
         }
     } catch (error) {
         console.error('Error loading current user:', error);
@@ -209,25 +214,62 @@ async function loadReviewStatuses() {
 
 // Load my reviews
 async function loadMyReviews() {
+    const container = document.getElementById('myReviewsContainer');
+    
     if (!currentUser) {
-        document.getElementById('myReviewsContainer').innerHTML = `
-            <div class="empty-state">
-                <h3>🔐 Требуется авторизация</h3>
-                <p>Войдите через Telegram чтобы увидеть отзывы о себе</p>
-            </div>
-        `;
-        return;
+        // Попробуем загрузить пользователя еще раз
+        await loadCurrentUser();
+        
+        if (!currentUser) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>🔄 Загрузка данных</h3>
+                    <p>Получаем информацию о ваших отзывах...</p>
+                </div>
+            `;
+            return;
+        }
     }
     
     try {
-        const reviews = currentUser.receivedReviews || [];
-        renderMyReviews(reviews);
+        // Загружаем свежие данные пользователя с отзывами
+        const telegramData = tg.initData;
+        if (!telegramData) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>⚠️ Данные недоступны</h3>
+                    <p>Попробуйте перезапустить приложение</p>
+                </div>
+            `;
+            return;
+        }
+
+        const response = await fetch(`${API_BASE}/users/me`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ telegramData })
+        });
+        
+        if (response.ok) {
+            const userData = await response.json();
+            const reviews = userData.receivedReviews || [];
+            renderMyReviews(reviews);
+        } else {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>❌ Ошибка загрузки</h3>
+                    <p>Не удалось загрузить отзывы</p>
+                </div>
+            `;
+        }
     } catch (error) {
         console.error('Error loading my reviews:', error);
-        document.getElementById('myReviewsContainer').innerHTML = `
+        container.innerHTML = `
             <div class="empty-state">
                 <h3>❌ Ошибка загрузки</h3>
-                <p>Не удалось загрузить отзывы</p>
+                <p>Проверьте подключение к интернету</p>
             </div>
         `;
     }
