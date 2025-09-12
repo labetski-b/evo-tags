@@ -25,8 +25,8 @@ const successDiv = document.getElementById('success');
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         showLoading(true);
-        await loadUsers();
-        await loadCurrentUser();
+        await loadCurrentUser(); // Сначала загружаем данные пользователя
+        await loadUsers(); // Потом загружаем всех пользователей
         setupTabNavigation();
         showLoading(false);
     } catch (error) {
@@ -66,7 +66,12 @@ async function loadUsers() {
         if (!response.ok) throw new Error('Failed to load users');
         
         users = await response.json();
-        renderUsers();
+        renderUsers(); // Сначала рендерим без статусов
+        
+        // Затем загружаем статусы и перерендериваем
+        if (currentUser) {
+            await loadReviewStatuses();
+        }
     } catch (error) {
         console.error('Error loading users:', error);
         throw error;
@@ -166,7 +171,6 @@ async function loadCurrentUser() {
         if (response.ok) {
             currentUser = await response.json();
             console.log('Current user loaded:', currentUser); // Debug log
-            await loadReviewStatuses();
         } else {
             console.error('Failed to load current user:', response.status);
         }
@@ -177,7 +181,12 @@ async function loadCurrentUser() {
 
 // Load review statuses for all users
 async function loadReviewStatuses() {
-    if (!currentUser) return;
+    if (!currentUser) {
+        console.log('No current user, skipping review statuses');
+        return;
+    }
+    
+    console.log('Loading review statuses for', users.length, 'users');
     
     try {
         // Reset statuses
@@ -201,8 +210,13 @@ async function loadReviewStatuses() {
             if (response.ok) {
                 const data = await response.json();
                 reviewStatuses[user.id] = data.review ? 'reviewed' : 'pending';
+                if (data.review) {
+                    console.log('Found review for user:', user.firstName);
+                }
             }
         }
+        
+        console.log('Review statuses loaded:', reviewStatuses);
         
         // Re-render users with status badges
         renderUsers();
