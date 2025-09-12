@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  telegramId BigInt   @unique @map("telegram_id")
+  username   String?
+  firstName  String   @map("first_name")
+  lastName   String?  @map("last_name")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  authoredReviews Review[] @relation("ReviewAuthor")
+  receivedReviews Review[] @relation("ReviewTarget")
+
+  @@map("users")
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  authorId      String   @map("author_id")
+  targetId      String   @map("target_id")
+  talentsAnswer String   @map("talents_answer") @db.Text
+  clientAnswer  String   @map("client_answer") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  author User @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  target User @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, targetId])
+  @@map("reviews")
+}
