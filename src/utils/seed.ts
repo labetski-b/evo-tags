@@ -52,8 +52,8 @@ const testReviews = [
   }
 ];
 
-export async function seedTestData() {
-  const prisma = new PrismaClient();
+export async function seedTestData(providedPrisma?: PrismaClient) {
+  const prisma = providedPrisma || new PrismaClient();
   
   try {
     console.log('🌱 Adding test users...');
@@ -98,8 +98,11 @@ export async function seedTestData() {
     console.log('🎉 Test data seeded successfully!');
   } catch (error) {
     console.error('❌ Error seeding test data:', error);
+    throw error;
   } finally {
-    await prisma.$disconnect();
+    if (!providedPrisma) {
+      await prisma.$disconnect();
+    }
   }
 }
 

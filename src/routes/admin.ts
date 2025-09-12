@@ -5,14 +5,11 @@ import { seedTestData } from '../utils/seed';
 export function adminRoutes(prisma: PrismaClient) {
   const router = Router();
 
-  // Добавить тестовые данные (только для разработки)
+  // Добавить тестовые данные
   router.post('/seed', async (req, res) => {
     try {
-      if (process.env.NODE_ENV === 'production') {
-        return res.status(403).json({ error: 'Seed endpoint disabled in production' });
-      }
 
-      await seedTestData();
+      await seedTestData(prisma);
       res.json({ success: true, message: 'Test data seeded successfully' });
     } catch (error) {
       console.error('Error seeding test data:', error);
@@ -23,9 +20,6 @@ export function adminRoutes(prisma: PrismaClient) {
   // Очистить тестовые данные
   router.delete('/test-data', async (req, res) => {
     try {
-      if (process.env.NODE_ENV === 'production') {
-        return res.status(403).json({ error: 'Delete endpoint disabled in production' });
-      }
 
       // Удаляем тестовых пользователей (каскадно удалятся и отзывы)
       const deleted = await prisma.user.deleteMany({
