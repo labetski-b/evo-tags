@@ -44,52 +44,44 @@ export function userRoutes(prisma: PrismaClient) {
       // Валидация данных от Telegram
       const userData = validateTelegramWebAppData(telegramData);
       if (!userData) {
-        console.error('Telegram data validation failed, trying fallback...');
-        // Временный fallback: попробуем взять первого пользователя из БД для тестирования
-        const firstUser = await prisma.user.findFirst();
-        if (firstUser) {
-          console.log('Using fallback user for testing:', firstUser.id);
-          const userWithReviews = await prisma.user.findUnique({
-            where: { id: firstUser.id },
-            include: {
-              receivedReviews: {
-                select: {
-                  id: true,
-                  talentsAnswer: true,
-                  clientAnswer: true,
-                  createdAt: true,
-                }
-              }
-            }
-          });
-          console.log('Fallback user has', userWithReviews?.receivedReviews.length || 0, 'reviews');
-          return res.json(userWithReviews);
-        }
-        return res.status(401).json({ error: 'Invalid Telegram data and no fallback available' });
+        console.error('Telegram data validation failed');
+        return res.status(401).json({ error: 'Invalid Telegram data' });
       }
 
       console.log('Looking for user with ID:', userData.id);
-      const user = await prisma.user.findUnique({
-        where: { telegramId: BigInt(userData.id) },
-        include: {
-          receivedReviews: {
-            select: {
-              id: true,
-              talentsAnswer: true,
-              clientAnswer: true,
-              createdAt: true,
+      
+      try {
+        // Проверяем, что ID это число
+        if (!userData.id || isNaN(Number(userData.id))) {
+          console.error('Invalid user ID:', userData.id);
+          return res.status(400).json({ error: 'Invalid user ID' });
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { telegramId: BigInt(userData.id) },
+          include: {
+            receivedReviews: {
+              select: {
+                id: true,
+                talentsAnswer: true,
+                clientAnswer: true,
+                createdAt: true,
+              }
             }
           }
+        });
+
+        if (!user) {
+          console.error('User not found for ID:', userData.id);
+          return res.status(404).json({ error: 'User not found' });
         }
-      });
 
-      if (!user) {
-        console.error('User not found for ID:', userData.id);
-        return res.status(404).json({ error: 'User not found' });
+        console.log('User found with', user.receivedReviews.length, 'reviews');
+        res.json(user);
+      } catch (dbError) {
+        console.error('Database error when finding user:', dbError);
+        throw dbError;
       }
-
-      console.log('User found with', user.receivedReviews.length, 'reviews');
-      res.json(user);
     } catch (error) {
       console.error('Error fetching current user:', error);
       res.status(500).json({ error: 'Internal server error' });
