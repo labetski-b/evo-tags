@@ -66,16 +66,16 @@
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            padding: 1rem;
+            border-radius: 12px;
+            padding: 0.75rem;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            aspect-ratio: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            min-height: 100px;
         }
         
         .user-card::before {
@@ -105,23 +105,23 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
         
         .user-avatar {
-            width: 48px;
-            height: 48px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--tg-theme-accent-text-color, #3b82f6), #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
             color: white;
             overflow: hidden;
             flex-shrink: 0;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         .user-avatar img {
@@ -132,10 +132,16 @@
         
         .user-info h3 {
             color: var(--tg-theme-text-color, #1e293b);
-            font-size: 1rem;
+            font-size: 0.85rem;
             font-weight: 600;
             margin: 0;
-            line-height: 1.3;
+            line-height: 1.2;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
         
         .user-info .username {
