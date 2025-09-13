@@ -375,6 +375,7 @@ async function openUserModal(user) {
         await loadUserReviews(user.id);
         userModal.style.display = 'block';
         hideNavigation();
+        showFloatingButton();
         showLoading(false);
     } catch (error) {
         console.error('Error loading user reviews:', error);
@@ -526,27 +527,48 @@ function showNavigation() {
     navTabs.classList.remove('hidden');
 }
 
+// Floating button control functions
+function showFloatingButton() {
+    const floatingButton = document.getElementById('floatingReviewButton');
+    floatingButton.style.display = 'block';
+    setTimeout(() => {
+        floatingButton.classList.add('show');
+    }, 50);
+}
+
+function hideFloatingButton() {
+    const floatingButton = document.getElementById('floatingReviewButton');
+    floatingButton.classList.remove('show');
+    setTimeout(() => {
+        floatingButton.style.display = 'none';
+    }, 300);
+}
+
 // Event listeners
 document.getElementById('closeModal').onclick = () => {
     userModal.style.display = 'none';
     showNavigation();
+    hideFloatingButton();
 };
 
-document.getElementById('writeReviewBtn').onclick = () => {
-    hideNavigation();
+// Updated floating button event listener
+document.getElementById('writeReviewFloatingBtn').onclick = () => {
+    hideFloatingButton();
     openReviewModal();
 };
 
 document.getElementById('closeReviewModal').onclick = () => {
     reviewModal.style.display = 'none';
     userModal.style.display = 'block';
-    showNavigation();
+    hideNavigation(); // Keep navigation hidden when returning to user modal
+    showFloatingButton(); // Show floating button when returning to user modal
 };
 
 document.getElementById('cancelReview').onclick = () => {
     reviewModal.style.display = 'none';
     userModal.style.display = 'block';
-    showNavigation();
+    hideNavigation(); // Keep navigation hidden when returning to user modal
+    showFloatingButton(); // Show floating button when returning to user modal
 };
 
 document.getElementById('reviewForm').onsubmit = submitReview;
@@ -556,11 +578,13 @@ window.onclick = (event) => {
     if (event.target === userModal) {
         userModal.style.display = 'none';
         showNavigation();
+        hideFloatingButton();
     }
     if (event.target === reviewModal) {
         reviewModal.style.display = 'none';
         userModal.style.display = 'block';
-        showNavigation();
+        hideNavigation(); // Keep navigation hidden when returning to user modal
+        showFloatingButton(); // Show floating button when returning to user modal
     }
 };
 
