@@ -69,7 +69,14 @@ export function userRoutes(prisma: PrismaClient) {
           
           if (firstUser) {
             console.log('Using fallback user with', firstUser.receivedReviews.length, 'reviews');
-            return res.json(firstUser);
+            
+            // Конвертируем BigInt в строку для JSON сериализации
+            const fallbackResponse = {
+              ...firstUser,
+              telegramId: firstUser.telegramId.toString()
+            };
+            
+            return res.json(fallbackResponse);
           }
           
           return res.status(404).json({ error: 'No users found' });
@@ -126,7 +133,14 @@ export function userRoutes(prisma: PrismaClient) {
         }
 
         console.log('User found with', user.receivedReviews.length, 'reviews');
-        res.json(user);
+        
+        // Конвертируем BigInt в строку для JSON сериализации
+        const userResponse = {
+          ...user,
+          telegramId: user.telegramId.toString()
+        };
+        
+        res.json(userResponse);
       } catch (dbError) {
         console.error('Database error when finding user:', dbError);
         throw dbError;
