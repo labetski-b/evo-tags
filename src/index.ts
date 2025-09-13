@@ -36,6 +36,17 @@ async function startServer() {
         // Try a simple query first to check if tables exist
         await prisma.user.findFirst();
         console.log('✅ Database schema is ready');
+        
+        // Try to remove unique constraint if it exists
+        try {
+          console.log('🔄 Removing unique constraint if exists...');
+          await prisma.$executeRaw`DROP INDEX IF EXISTS "reviews_authorId_targetId_key"`;
+          await prisma.$executeRaw`DROP INDEX IF EXISTS "Review_authorId_targetId_key"`;
+          await prisma.$executeRaw`DROP INDEX IF EXISTS "reviews_author_id_target_id_key"`;
+          console.log('✅ Unique constraint removal completed');
+        } catch (constraintError) {
+          console.log('⚠️ Unique constraint removal failed (may not exist):', (constraintError as Error).message);
+        }
       } catch (error) {
         // If tables don't exist, run db push
         console.log('📋 Creating database tables...');
