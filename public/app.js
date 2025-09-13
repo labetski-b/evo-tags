@@ -336,8 +336,10 @@ function renderMyReviews(reviews) {
                         getInitials([currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Вы')
                     }
                 </div>
-                <div class="profile-name">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Ваш профиль'}</div>
-                <div class="profile-stats">0 отзывов</div>
+                <div class="profile-info">
+                    <div class="profile-name">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Ваш профиль'}</div>
+                    <div class="profile-stats">0 отзывов</div>
+                </div>
             </div>
             <div class="empty-state">
                 <h3>🌟 Пока нет отзывов</h3>
@@ -356,8 +358,10 @@ function renderMyReviews(reviews) {
                     getInitials([currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Вы')
                 }
             </div>
-            <div class="profile-name">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Ваш профиль'}</div>
-            <div class="profile-stats">${reviews.length} ${getReviewsWordForm(reviews.length)}</div>
+            <div class="profile-info">
+                <div class="profile-name">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Ваш профиль'}</div>
+                <div class="profile-stats">${reviews.length} ${getReviewsWordForm(reviews.length)}</div>
+            </div>
         </div>
     `;
     
