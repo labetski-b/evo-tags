@@ -234,8 +234,19 @@
         }
         
         .nav-tab-icon {
-            font-size: 1.5rem;
+            width: 24px;
+            height: 24px;
             transition: all 0.3s ease;
+        }
+        
+        .nav-tab-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         
         .nav-tab.active {
@@ -599,11 +610,23 @@
     <!-- Bottom Navigation -->
     <div class="nav-tabs">
         <button class="nav-tab active" data-tab="all-users">
-            <div class="nav-tab-icon">👥</div>
+            <div class="nav-tab-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
             <div>Участники</div>
         </button>
         <button class="nav-tab" data-tab="about-me">
-            <div class="nav-tab-icon">👤</div>
+            <div class="nav-tab-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
             <div>Про меня</div>
         </button>
     </div>
