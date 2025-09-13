@@ -39,6 +39,5 @@ model Review {
   author User @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
   target User @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
 
-  @@unique([authorId, targetId])
   @@map("reviews")
 }

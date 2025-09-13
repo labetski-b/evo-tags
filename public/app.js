@@ -95,12 +95,7 @@ async function loadUsers() {
         if (!response.ok) throw new Error('Failed to load users');
         
         users = await response.json();
-        renderUsers(); // Сначала рендерим без статусов
-        
-        // Затем загружаем статусы и перерендериваем
-        if (currentUser) {
-            await loadReviewStatuses();
-        }
+        renderUsers();
     } catch (error) {
         console.error('Error loading users:', error);
         throw error;
@@ -211,51 +206,7 @@ async function loadCurrentUser() {
     }
 }
 
-// Load review statuses for all users
-async function loadReviewStatuses() {
-    if (!currentUser) {
-        console.log('No current user, skipping review statuses');
-        return;
-    }
-    
-    console.log('Loading review statuses for', users.length, 'users');
-    
-    try {
-        // Reset statuses
-        reviewStatuses = {};
-        
-        // Check which users I've reviewed
-        for (const user of users) {
-            if (user.id === currentUser.id) continue;
-            
-            const response = await fetch(`${API_BASE}/reviews/check`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegramData: tg.initData,
-                    targetUserId: user.id
-                })
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                reviewStatuses[user.id] = data.review ? 'reviewed' : 'pending';
-                if (data.review) {
-                    console.log('Found review for user:', user.firstName);
-                }
-            }
-        }
-        
-        console.log('Review statuses loaded:', reviewStatuses);
-        
-        // Re-render users with status badges
-        renderUsers();
-    } catch (error) {
-        console.error('Error loading review statuses:', error);
-    }
-}
+// Review statuses no longer needed - users can create multiple reviews
 
 // Load my reviews
 async function loadMyReviews() {
@@ -390,16 +341,9 @@ function renderMyReviews(reviews) {
     container.innerHTML = profileCard + reviewsHtml;
 }
 
-// Get status badge for user
+// Get status badge for user - no longer showing badges since multiple reviews are allowed
 function getStatusBadge(userId) {
-    if (!currentUser || userId === currentUser.id) return '';
-    
-    const status = reviewStatuses[userId];
-    if (status === 'reviewed') {
-        return '<div class="status-badge status-reviewed">✓</div>';
-    }
-    
-    return ''; // Убираем лишние метки
+    return ''; // No status badges needed
 }
 
 // Open user modal
@@ -470,31 +414,9 @@ function renderReviews(reviews) {
 
 // Open review modal
 async function openReviewModal() {
-    // Check if user already has a review for this person
-    try {
-        const telegramData = tg.initData;
-        const response = await fetch(`${API_BASE}/reviews/check`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                telegramData,
-                targetUserId: selectedUserId
-            })
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            if (data.review) {
-                // Pre-fill form with existing review
-                document.getElementById('talentsAnswer').value = data.review.talentsAnswer;
-                document.getElementById('clientAnswer').value = data.review.clientAnswer;
-            }
-        }
-    } catch (error) {
-        console.error('Error checking existing review:', error);
-    }
+    // Clear form for new review (no more pre-filling)
+    document.getElementById('talentsAnswer').value = '';
+    document.getElementById('clientAnswer').value = '';
     
     reviewModal.style.display = 'block';
     userModal.style.display = 'none';
@@ -540,9 +462,6 @@ async function submitReview(event) {
         
         // Reload reviews for the user
         await loadUserReviews(selectedUserId);
-        
-        // Update review statuses for all users
-        await loadReviewStatuses();
         
         userModal.style.display = 'block';
         

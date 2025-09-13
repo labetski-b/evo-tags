@@ -45,21 +45,11 @@ export function reviewRoutes(prisma: PrismaClient) {
         return res.status(400).json({ error: 'Cannot review yourself' });
       }
 
-      // Создать отзыв (или обновить существующий)
-      const review = await prisma.review.upsert({
-        where: {
-          authorId_targetId: {
-            authorId: author.id,
-            targetId: targetUserId
-          }
-        },
-        create: {
+      // Создать новый отзыв
+      const review = await prisma.review.create({
+        data: {
           authorId: author.id,
           targetId: targetUserId,
-          talentsAnswer,
-          clientAnswer
-        },
-        update: {
           talentsAnswer,
           clientAnswer
         }
