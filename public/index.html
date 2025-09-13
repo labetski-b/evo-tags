@@ -225,7 +225,7 @@
         
         .floating-review-button {
             position: fixed;
-            bottom: 1rem;
+            bottom: 5rem;
             left: 1rem;
             right: 1rem;
             z-index: 1001;
@@ -478,41 +478,45 @@
             margin: 0;
         }
         
-        .review-item {
-            background: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.7));
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--tg-theme-section-separator-color, rgba(255, 255, 255, 0.3));
+        .review-block {
+            background: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.8));
+            border: 1px solid var(--tg-theme-section-separator-color, rgba(0, 0, 0, 0.05));
             border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .review-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .review-question {
-            font-weight: 600;
-            background: linear-gradient(135deg, var(--tg-theme-accent-text-color, #3b82f6), #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
-        }
-        
-        .review-answer {
+            padding: 1.25rem;
             margin-bottom: 1rem;
-            line-height: 1.6;
-            color: var(--tg-theme-text-color, #374151);
+            transition: all 0.2s ease;
+        }
+        
+        .review-block:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .review-block:last-child {
+            margin-bottom: 0;
+        }
+        
+        .review-content {
+            line-height: 1.5;
+            color: var(--tg-theme-text-color, #1a1a1a);
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .review-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--tg-theme-hint-color, #8e8e93);
+        }
+        
+        .review-author {
+            font-weight: 500;
         }
         
         .review-date {
-            font-size: 0.85rem;
-            color: var(--tg-theme-hint-color, #9ca3af);
-            font-weight: 500;
+            font-weight: 400;
         }
         
         .btn {
@@ -602,6 +606,60 @@
         .form-textarea.focused {
             scroll-margin-top: 2rem;
             scroll-margin-bottom: 2rem;
+        }
+        
+        /* Modal tabs */
+        .modal-tabs {
+            display: flex;
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 1.5rem;
+            gap: 4px;
+        }
+        
+        .modal-tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-tab.active {
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #1a1a1a);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .modal-tab:hover:not(.active) {
+            color: var(--tg-theme-text-color, #1a1a1a);
+            background: rgba(0, 0, 0, 0.03);
+        }
+        
+        .modal-tab-content {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .modal-tab-panel {
+            display: none;
+        }
+        
+        .modal-tab-panel.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .loading {
@@ -695,8 +753,24 @@
                 <button class="close" id="closeModal">&times;</button>
             </div>
             <div class="modal-body">
-                <div id="reviewsList">
-                    <!-- Reviews will be loaded here -->
+                <!-- Modal Tabs -->
+                <div class="modal-tabs">
+                    <button class="modal-tab active" data-modal-tab="talents">Таланты</button>
+                    <button class="modal-tab" data-modal-tab="clients">Клиенты</button>
+                </div>
+                
+                <!-- Tab Content -->
+                <div class="modal-tab-content">
+                    <div class="modal-tab-panel active" id="talents-panel">
+                        <div id="talentsReviewsList">
+                            <!-- Talents reviews will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="modal-tab-panel" id="clients-panel">
+                        <div id="clientsReviewsList">
+                            <!-- Clients reviews will be loaded here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -398,34 +398,49 @@ async function loadUserReviews(userId) {
     }
 }
 
-// Render reviews
+// Render reviews in tabs
 function renderReviews(reviews) {
-    const reviewsList = document.getElementById('reviewsList');
+    const talentsContainer = document.getElementById('talentsReviewsList');
+    const clientsContainer = document.getElementById('clientsReviewsList');
     
     if (reviews.length === 0) {
-        reviewsList.innerHTML = `
+        const emptyState = `
             <div class="empty-reviews-state">
                 <div class="icon">⭐</div>
                 <h3>Пока нет отзывов</h3>
                 <p>Станьте первым, кто оставит<br>отзыв об этом человеке!</p>
             </div>
         `;
+        talentsContainer.innerHTML = emptyState;
+        clientsContainer.innerHTML = emptyState;
         return;
     }
     
-    reviewsList.innerHTML = reviews.map(review => `
-        <div class="review-item">
-            <div class="review-question">💡 Таланты, силы, компетенции, темы:</div>
-            <div class="review-answer">${review.talentsAnswer}</div>
-            
-            <div class="review-question">🎯 Какого клиента бы привели:</div>
-            <div class="review-answer">${review.clientAnswer}</div>
-            
-            <div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            })}</div>
+    // Render talents reviews
+    talentsContainer.innerHTML = reviews.map(review => `
+        <div class="review-block">
+            <div class="review-content">${review.talentsAnswer}</div>
+            <div class="review-meta">
+                <span class="review-author">Анонимно</span>
+                <span class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'short'
+                })}</span>
+            </div>
+        </div>
+    `).join('');
+    
+    // Render clients reviews
+    clientsContainer.innerHTML = reviews.map(review => `
+        <div class="review-block">
+            <div class="review-content">${review.clientAnswer}</div>
+            <div class="review-meta">
+                <span class="review-author">Анонимно</span>
+                <span class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'short'
+                })}</span>
+            </div>
         </div>
     `).join('');
 }
@@ -645,3 +660,26 @@ function handleKeyboardVisibility() {
 
 // Initialize keyboard handling
 handleKeyboardVisibility();
+
+// Modal tabs functionality
+function initModalTabs() {
+    const modalTabs = document.querySelectorAll('.modal-tab');
+    const modalPanels = document.querySelectorAll('.modal-tab-panel');
+    
+    modalTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetPanel = tab.getAttribute('data-modal-tab');
+            
+            // Remove active class from all tabs and panels
+            modalTabs.forEach(t => t.classList.remove('active'));
+            modalPanels.forEach(p => p.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding panel
+            tab.classList.add('active');
+            document.getElementById(`${targetPanel}-panel`).classList.add('active');
+        });
+    });
+}
+
+// Initialize modal tabs when DOM is loaded
+initModalTabs();
