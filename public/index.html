@@ -313,6 +313,8 @@
             z-index: 1000;
             padding: 1rem;
             animation: fadeIn 0.3s ease-out;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         @keyframes fadeIn {
@@ -324,11 +326,19 @@
             background: var(--tg-theme-bg-color, #ffffff);
             border-radius: 24px;
             max-width: 500px;
-            margin: 15vh auto 0;
+            margin: 2rem auto;
             position: relative;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             overflow: hidden;
+            max-height: calc(100vh - 4rem);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-content.keyboard-open {
+            margin: 1rem auto;
+            max-height: calc(100vh - 2rem);
         }
         
         @keyframes slideUp {
@@ -353,6 +363,9 @@
         .modal-body {
             padding: 1.5rem 2rem 2rem;
             text-align: center;
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .close {
@@ -476,9 +489,6 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
         
-        .form-group {
-            margin-bottom: 2rem;
-        }
         
         .form-label {
             display: block;
@@ -509,6 +519,26 @@
             border-color: var(--tg-theme-accent-text-color, #3b82f6);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 8px 25px rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group:last-of-type {
+            margin-bottom: 2rem;
+        }
+        
+        /* Улучшенная прокрутка для iOS */
+        .modal-body::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+        
+        /* Плавный скролл при фокусе на поле */
+        .form-textarea.focused {
+            scroll-margin-top: 2rem;
+            scroll-margin-bottom: 2rem;
         }
         
         .loading {

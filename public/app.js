@@ -543,3 +543,61 @@ window.onclick = (event) => {
         userModal.style.display = 'block';
     }
 };
+
+// Handle keyboard visibility for mobile
+function handleKeyboardVisibility() {
+    let keyboardOpen = false;
+    
+    // Detect when keyboard opens/closes by monitoring viewport height changes
+    function checkViewportHeight() {
+        const currentHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        const fullHeight = window.screen.height;
+        const keyboardThreshold = fullHeight * 0.7; // Keyboard likely open if viewport < 70% of screen
+        
+        const isKeyboardOpen = currentHeight < keyboardThreshold;
+        
+        if (isKeyboardOpen !== keyboardOpen) {
+            keyboardOpen = isKeyboardOpen;
+            
+            const modalContents = document.querySelectorAll('.modal-content');
+            modalContents.forEach(modal => {
+                if (isKeyboardOpen) {
+                    modal.classList.add('keyboard-open');
+                } else {
+                    modal.classList.remove('keyboard-open');
+                }
+            });
+            
+            // Scroll focused input into view when keyboard opens
+            if (isKeyboardOpen) {
+                setTimeout(() => {
+                    const activeElement = document.activeElement;
+                    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+                        activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 300);
+            }
+        }
+    }
+    
+    // Listen for viewport changes
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', checkViewportHeight);
+    } else {
+        window.addEventListener('resize', checkViewportHeight);
+    }
+    
+    // Also listen for focus events on form elements
+    document.addEventListener('focusin', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            setTimeout(() => checkViewportHeight(), 300);
+        }
+    });
+    
+    document.addEventListener('focusout', () => {
+        setTimeout(() => checkViewportHeight(), 300);
+    });
+}
+
+// Initialize keyboard handling
+handleKeyboardVisibility();
