@@ -124,5 +124,38 @@ export function reviewRoutes(prisma: PrismaClient) {
     }
   });
 
+  // Получить все отзывы для ленты
+  router.get('/feed', async (req, res) => {
+    try {
+      const reviews = await prisma.review.findMany({
+        include: {
+          author: {
+            select: {
+              firstName: true,
+              lastName: true,
+              photoUrl: true
+            }
+          },
+          target: {
+            select: {
+              firstName: true,
+              lastName: true,
+              photoUrl: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 50 // Ограничиваем количество для производительности
+      });
+
+      res.json(reviews);
+    } catch (error) {
+      console.error('Error fetching feed:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   return router;
 }

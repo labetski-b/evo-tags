@@ -175,6 +175,9 @@ function switchTab(tabName) {
     if (tabName === 'about-me') {
         // Всегда перезагружаем данные при переходе на вкладку "Про меня"
         loadMyReviews();
+    } else if (tabName === 'feed') {
+        // Загружаем ленту отзывов
+        loadFeed();
     }
 }
 
@@ -669,3 +672,91 @@ function initModalTabs() {
 
 // Initialize modal tabs when DOM is loaded
 initModalTabs();
+
+// Load feed
+async function loadFeed() {
+    const container = document.getElementById('feedContainer');
+    
+    // Показать загрузку
+    container.innerHTML = `
+        <div class="empty-state">
+            <h3>🔄 Загрузка...</h3>
+            <p>Загружаем ленту отзывов</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`${API_BASE}/reviews/feed`);
+        
+        if (response.ok) {
+            const reviews = await response.json();
+            console.log('Feed loaded:', reviews);
+            renderFeed(reviews);
+        } else {
+            const errorData = await response.text();
+            console.error('Failed to load feed:', response.status, errorData);
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>❌ Ошибка загрузки</h3>
+                    <p>Не удалось загрузить ленту отзывов</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading feed:', error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>❌ Ошибка загрузки</h3>
+                <p>Проверьте подключение к интернету</p>
+            </div>
+        `;
+    }
+}
+
+// Render feed
+function renderFeed(reviews) {
+    const container = document.getElementById('feedContainer');
+    
+    if (reviews.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>📝 Пока нет отзывов</h3>
+                <p>Как только кто-то оставит отзыв, он появится в ленте</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = reviews.map(review => {
+        const authorName = [review.author?.firstName, review.author?.lastName].filter(Boolean).join(' ') || 'Аноним';
+        const targetName = [review.target?.firstName, review.target?.lastName].filter(Boolean).join(' ') || 'Неизвестно';
+        const authorInitials = getInitials(authorName);
+        
+        return `
+            <div class="feed-item">
+                <div class="feed-header">
+                    <div class="feed-avatar">
+                        ${review.author?.photoUrl ? 
+                            `<img src="${review.author.photoUrl}" alt="${authorName}">` : 
+                            authorInitials
+                        }
+                    </div>
+                    <div class="feed-info">
+                        <div class="feed-names">${authorName} → ${targetName}</div>
+                        <div class="feed-context">оставил отзыв</div>
+                    </div>
+                </div>
+                
+                <div class="feed-content">
+                    <div class="feed-type">💡 Таланты и компетенции</div>
+                    <div>${review.talentsAnswer}</div>
+                </div>
+                
+                <div class="feed-content" style="margin-top: 0.75rem;">
+                    <div class="feed-type">🎯 Подходящие клиенты</div>
+                    <div>${review.clientAnswer}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}

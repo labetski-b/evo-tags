@@ -343,6 +343,85 @@
             gap: 1.5rem;
         }
         
+        .feed-container {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .feed-item {
+            background: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.8));
+            border: 1px solid var(--tg-theme-section-separator-color, rgba(0, 0, 0, 0.05));
+            border-radius: 16px;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+        }
+        
+        .feed-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .feed-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feed-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--tg-theme-accent-text-color, #3b82f6), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .feed-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .feed-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .feed-names {
+            font-weight: 600;
+            color: var(--tg-theme-text-color, #1a1a1a);
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .feed-context {
+            font-size: 0.85rem;
+            color: var(--tg-theme-hint-color, #8e8e93);
+        }
+        
+        .feed-content {
+            background: var(--tg-theme-bg-color, #f8f9fa);
+            border-radius: 12px;
+            padding: 1rem;
+            line-height: 1.5;
+            color: var(--tg-theme-text-color, #1a1a1a);
+            font-size: 0.95rem;
+        }
+        
+        .feed-type {
+            font-weight: 600;
+            color: var(--tg-theme-accent-text-color, #007AFF);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
         .my-review-card {
             background: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.8));
             backdrop-filter: blur(10px);
@@ -720,6 +799,13 @@
             </div>
         </div>
         
+        <!-- Feed Tab -->
+        <div class="tab-content" id="feed">
+            <div class="feed-container" id="feedContainer">
+                <!-- Feed will be loaded here -->
+            </div>
+        </div>
+        
         <!-- About Me Tab -->
         <div class="tab-content" id="about-me">
             <div class="my-reviews-container" id="myReviewsContainer">
@@ -810,6 +896,16 @@
                 </svg>
             </div>
             <div>Участники</div>
+        </button>
+        <button class="nav-tab" data-tab="feed">
+            <div class="nav-tab-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 11a9 9 0 0 1 9 9"></path>
+                    <path d="M4 4a16 16 0 0 1 16 16"></path>
+                    <circle cx="5" cy="19" r="1"></circle>
+                </svg>
+            </div>
+            <div>Лента</div>
         </button>
         <button class="nav-tab" data-tab="about-me">
             <div class="nav-tab-icon">
