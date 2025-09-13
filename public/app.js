@@ -390,6 +390,7 @@ async function openUserModal(user) {
         showLoading(true);
         await loadUserReviews(user.id);
         userModal.style.display = 'block';
+        document.body.classList.add('modal-open'); // Блокируем скролл фона
         hideNavigation();
         showFloatingButton();
         showLoading(false);
@@ -455,6 +456,7 @@ async function openReviewModal() {
     
     reviewModal.style.display = 'block';
     userModal.style.display = 'none';
+    document.body.classList.add('modal-open'); // Блокируем скролл фона
 }
 
 // Submit review
@@ -491,7 +493,9 @@ async function submitReview(event) {
             throw new Error(error.error || 'Failed to submit review');
         }
         
-        showSuccess('Отзыв успешно сохранен!');
+        // Показываем анимацию празднования
+        showCelebration();
+        
         reviewModal.style.display = 'none';
         document.getElementById('reviewForm').reset();
         
@@ -542,6 +546,7 @@ function hideFloatingButton() {
 // Event listeners
 document.getElementById('closeModal').onclick = () => {
     userModal.style.display = 'none';
+    document.body.classList.remove('modal-open'); // Разблокируем скролл фона
     showNavigation();
     hideFloatingButton();
 };
@@ -555,6 +560,7 @@ document.getElementById('writeReviewFloatingBtn').onclick = () => {
 document.getElementById('closeReviewModal').onclick = () => {
     reviewModal.style.display = 'none';
     userModal.style.display = 'block';
+    document.body.classList.add('modal-open'); // Продолжаем блокировку скролла
     hideNavigation(); // Keep navigation hidden when returning to user modal
     showFloatingButton(); // Show floating button when returning to user modal
 };
@@ -567,16 +573,29 @@ document.getElementById('reviewForm').onsubmit = submitReview;
 window.onclick = (event) => {
     if (event.target === userModal) {
         userModal.style.display = 'none';
+        document.body.classList.remove('modal-open'); // Разблокируем скролл фона
         showNavigation();
         hideFloatingButton();
     }
     if (event.target === reviewModal) {
         reviewModal.style.display = 'none';
         userModal.style.display = 'block';
+        document.body.classList.add('modal-open'); // Продолжаем блокировку скролла
         hideNavigation(); // Keep navigation hidden when returning to user modal
         showFloatingButton(); // Show floating button when returning to user modal
     }
 };
+
+// Show celebration animation
+function showCelebration() {
+    const overlay = document.getElementById('celebrationOverlay');
+    overlay.style.display = 'flex';
+    
+    // Скрываем анимацию через 2 секунды
+    setTimeout(() => {
+        overlay.style.display = 'none';
+    }, 2000);
+}
 
 // Handle keyboard visibility for mobile
 function handleKeyboardVisibility() {
