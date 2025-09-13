@@ -66,53 +66,7 @@ export function reviewRoutes(prisma: PrismaClient) {
     }
   });
 
-  // Получить отзыв пользователя о другом пользователе
-  router.post('/check', async (req, res) => {
-    try {
-      const { telegramData, targetUserId } = req.body;
-      
-      if (!telegramData || !targetUserId) {
-        return res.status(400).json({ 
-          error: 'telegramData and targetUserId are required' 
-        });
-      }
-
-      // Валидация данных от Telegram
-      const userData = validateTelegramWebAppData(telegramData);
-      if (!userData) {
-        return res.status(401).json({ error: 'Invalid Telegram data' });
-      }
-
-      // Найти автора
-      const author = await prisma.user.findUnique({
-        where: { telegramId: BigInt(userData.id) }
-      });
-
-      if (!author) {
-        return res.status(404).json({ error: 'Author not found' });
-      }
-
-      // Найти существующий отзыв
-      const review = await prisma.review.findUnique({
-        where: {
-          authorId_targetId: {
-            authorId: author.id,
-            targetId: targetUserId
-          }
-        },
-        select: {
-          talentsAnswer: true,
-          clientAnswer: true,
-          createdAt: true
-        }
-      });
-
-      res.json({ review });
-    } catch (error) {
-      console.error('Error checking review:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+  // Check endpoint removed - multiple reviews are now allowed
 
   // Получить все отзывы для ленты
   router.get('/feed', async (req, res) => {

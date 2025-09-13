@@ -73,20 +73,19 @@ export async function seedTestData(providedPrisma?: PrismaClient) {
     // Создаем тестовые отзывы
     console.log('📝 Adding test reviews...');
     for (const review of testReviews) {
-      await prisma.review.upsert({
+      // Удаляем существующие отзывы от этого автора к этой цели (для перезапуска seed)
+      await prisma.review.deleteMany({
         where: {
-          authorId_targetId: {
-            authorId: createdUsers[review.authorIndex].id,
-            targetId: createdUsers[review.targetIndex].id
-          }
-        },
-        create: {
+          authorId: createdUsers[review.authorIndex].id,
+          targetId: createdUsers[review.targetIndex].id
+        }
+      });
+      
+      // Создаем новый отзыв
+      await prisma.review.create({
+        data: {
           authorId: createdUsers[review.authorIndex].id,
           targetId: createdUsers[review.targetIndex].id,
-          talentsAnswer: review.talentsAnswer,
-          clientAnswer: review.clientAnswer
-        },
-        update: {
           talentsAnswer: review.talentsAnswer,
           clientAnswer: review.clientAnswer
         }
