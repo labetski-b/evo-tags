@@ -728,22 +728,21 @@ function renderFeed(reviews) {
     }
 
     container.innerHTML = reviews.map(review => {
-        const authorName = [review.author?.firstName, review.author?.lastName].filter(Boolean).join(' ') || 'Аноним';
         const targetName = [review.target?.firstName, review.target?.lastName].filter(Boolean).join(' ') || 'Неизвестно';
-        const authorInitials = getInitials(authorName);
+        const targetInitials = getInitials(targetName);
         
         return `
             <div class="feed-item">
                 <div class="feed-header">
                     <div class="feed-avatar">
-                        ${review.author?.photoUrl ? 
-                            `<img src="${review.author.photoUrl}" alt="${authorName}">` : 
-                            authorInitials
+                        ${review.target?.photoUrl ? 
+                            `<img src="${review.target.photoUrl}" alt="${targetName}">` : 
+                            targetInitials
                         }
                     </div>
                     <div class="feed-info">
-                        <div class="feed-names">${authorName} → ${targetName}</div>
-                        <div class="feed-context">оставил отзыв</div>
+                        <div class="feed-names">${targetName}</div>
+                        <div class="feed-context">получил новый отзыв</div>
                     </div>
                 </div>
                 

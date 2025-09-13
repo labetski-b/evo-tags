@@ -129,13 +129,6 @@ export function reviewRoutes(prisma: PrismaClient) {
     try {
       const reviews = await prisma.review.findMany({
         include: {
-          author: {
-            select: {
-              firstName: true,
-              lastName: true,
-              photoUrl: true
-            }
-          },
           target: {
             select: {
               firstName: true,
