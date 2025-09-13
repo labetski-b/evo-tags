@@ -46,18 +46,27 @@ export function reviewRoutes(prisma: PrismaClient) {
       }
 
       // Создать новый отзыв
-      const review = await prisma.review.create({
-        data: {
-          authorId: author.id,
-          targetId: targetUserId,
-          talentsAnswer,
-          clientAnswer
-        }
-      }).catch(async (error) => {
+      let reviewResult;
+      try {
+        reviewResult = await prisma.review.create({
+          data: {
+            authorId: author.id,
+            targetId: targetUserId,
+            talentsAnswer,
+            clientAnswer
+          }
+        });
+        
+        res.json({ 
+          success: true, 
+          reviewId: reviewResult.id,
+          message: 'Review saved successfully' 
+        });
+      } catch (error: any) {
         // Если все еще есть уникальное ограничение, попробуем обновить существующий отзыв
         if (error.code === 'P2002') {
           console.log('Unique constraint still exists, falling back to update');
-          return await prisma.review.updateMany({
+          const updateResult = await prisma.review.updateMany({
             where: {
               authorId: author.id,
               targetId: targetUserId
@@ -67,15 +76,16 @@ export function reviewRoutes(prisma: PrismaClient) {
               clientAnswer
             }
           });
+          
+          res.json({ 
+            success: true, 
+            updated: updateResult.count,
+            message: 'Review updated successfully' 
+          });
+        } else {
+          throw error;
         }
-        throw error;
-      });
-
-      res.json({ 
-        success: true, 
-        reviewId: review.id,
-        message: 'Review saved successfully' 
-      });
+      }
     } catch (error) {
       console.error('Error creating review:', error);
       res.status(500).json({ error: 'Internal server error' });
