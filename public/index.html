@@ -571,16 +571,15 @@
         }
         
         .modal-footer {
-            padding: 1.5rem 2rem 2rem;
+            padding: 1rem 2rem 2rem;
             border-top: 1px solid var(--tg-theme-section-separator-color, rgba(0, 0, 0, 0.05));
             background: var(--tg-theme-bg-color, #ffffff);
             flex-shrink: 0;
         }
         
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
+        .btn-full-width {
+            width: 100%;
+            max-width: none;
         }
         
         .close {
@@ -940,12 +939,9 @@
                 </form>
             </div>
             
-            <!-- Кнопки внизу модального окна, но вне скроллящейся области -->
+            <!-- Кнопка отправки внизу модального окна -->
             <div class="modal-footer">
-                <div class="modal-actions">
-                    <button type="submit" form="reviewForm" class="btn">Отправить отзыв</button>
-                    <button type="button" class="btn btn-secondary" id="cancelReview">Отмена</button>
-                </div>
+                <button type="submit" form="reviewForm" class="btn btn-full-width">Отправить отзыв</button>
             </div>
         </div>
     </div>

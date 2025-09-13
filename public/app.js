@@ -559,12 +559,7 @@ document.getElementById('closeReviewModal').onclick = () => {
     showFloatingButton(); // Show floating button when returning to user modal
 };
 
-document.getElementById('cancelReview').onclick = () => {
-    reviewModal.style.display = 'none';
-    userModal.style.display = 'block';
-    hideNavigation(); // Keep navigation hidden when returning to user modal
-    showFloatingButton(); // Show floating button when returning to user modal
-};
+// cancelReview button removed - using only close (X) button
 
 document.getElementById('reviewForm').onsubmit = submitReview;
 
