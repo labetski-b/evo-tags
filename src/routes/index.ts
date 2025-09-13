@@ -16,7 +16,7 @@ export function setupRoutes(app: Express, prisma: PrismaClient) {
   app.use(`${apiPrefix}/reviews`, reviewRoutes(prisma));
   
   // Admin routes (only for development)
-  app.use(`${apiPrefix}/admin`, adminRoutes(prisma));
+  app.use(`${apiPrefix}/admin`, adminRoutes());
   
   // Media proxy routes
   app.use(`${apiPrefix}/media`, mediaRoutes());

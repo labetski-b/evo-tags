@@ -1,43 +1,36 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { seedTestData } from '../utils/seed';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
-export function adminRoutes(prisma: PrismaClient) {
+const execAsync = promisify(exec);
+
+export function adminRoutes() {
   const router = Router();
 
-  // Добавить тестовые данные
-  router.post('/seed', async (req, res) => {
+  // Эндпоинт для обновления схемы базы данных
+  router.post('/update-schema', async (req, res) => {
     try {
-
-      await seedTestData(prisma);
-      res.json({ success: true, message: 'Test data seeded successfully' });
-    } catch (error) {
-      console.error('Error seeding test data:', error);
-      res.status(500).json({ error: 'Failed to seed test data' });
-    }
-  });
-
-  // Очистить тестовые данные
-  router.delete('/test-data', async (req, res) => {
-    try {
-
-      // Удаляем тестовых пользователей (каскадно удалятся и отзывы)
-      const deleted = await prisma.user.deleteMany({
-        where: {
-          telegramId: {
-            gte: BigInt(999999000),
-            lte: BigInt(999999999)
-          }
-        }
-      });
-
+      console.log('Starting database schema update...');
+      
+      // Выполняем prisma db push для принудительного обновления схемы
+      const { stdout, stderr } = await execAsync('npx prisma db push --accept-data-loss --force-reset');
+      
+      console.log('Schema update stdout:', stdout);
+      if (stderr) {
+        console.warn('Schema update stderr:', stderr);
+      }
+      
       res.json({ 
         success: true, 
-        message: `Deleted ${deleted.count} test users and their reviews` 
+        message: 'Database schema updated successfully',
+        output: stdout
       });
     } catch (error) {
-      console.error('Error deleting test data:', error);
-      res.status(500).json({ error: 'Failed to delete test data' });
+      console.error('Error updating schema:', error);
+      res.status(500).json({ 
+        error: 'Failed to update schema',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 

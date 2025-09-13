@@ -7,6 +7,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "deploy:schema": "prisma db push --accept-data-loss",
     "db:generate": "prisma generate",
     "db:push": "prisma db push", 
     "db:migrate": "prisma migrate dev",
