@@ -338,19 +338,28 @@ function renderMyReviews(reviews) {
     }
     
     container.innerHTML = reviews.map(review => `
-        <div class="my-review-card">
-            <div class="review-from">Анонимный отзыв • ${new Date(review.createdAt).toLocaleDateString('ru-RU', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            })}</div>
+        <div class="feed-item">
+            <div class="feed-header">
+                <div class="feed-avatar">
+                    ${currentUser?.photoUrl ? 
+                        `<img src="${currentUser.photoUrl}" alt="${currentUser.firstName || 'Вы'}">` : 
+                        getInitials([currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Вы')
+                    }
+                </div>
+                <div class="feed-info">
+                    <div class="feed-names">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Вы'}</div>
+                    <div class="feed-context">получили новый отзыв</div>
+                </div>
+            </div>
             
-            <div class="review-item">
-                <div class="review-question">💡 Таланты, силы, компетенции, темы:</div>
-                <div class="review-answer">${review.talentsAnswer}</div>
-                
-                <div class="review-question">🎯 Какого клиента бы привели:</div>
-                <div class="review-answer">${review.clientAnswer}</div>
+            <div class="feed-content">
+                <div class="feed-type">💡 Таланты и компетенции</div>
+                <div>${review.talentsAnswer}</div>
+            </div>
+            
+            <div class="feed-content" style="margin-top: 0.75rem;">
+                <div class="feed-type">🎯 Подходящие клиенты</div>
+                <div>${review.clientAnswer}</div>
             </div>
         </div>
     `).join('');
