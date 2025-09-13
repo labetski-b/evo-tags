@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await Promise.race([
             (async () => {
                 await loadCurrentUser(); // Сначала загружаем данные пользователя
-                await loadUsers(); // Потом загружаем всех пользователей
+                await loadUsers(); // Потом загружаем всех пользователей со статусом
                 setupTabNavigation();
             })(),
             timeoutPromise
@@ -88,10 +88,26 @@ function showSuccess(message) {
     }, 3000);
 }
 
-// Load users
+// Load users with review status
 async function loadUsers() {
     try {
-        const response = await fetch(`${API_BASE}/users`);
+        let response;
+        const telegramData = tg.initData;
+        
+        if (telegramData && currentUser) {
+            // Загружаем пользователей со статусом отзывов
+            response = await fetch(`${API_BASE}/users/with-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ telegramData })
+            });
+        } else {
+            // Fallback к обычному API
+            response = await fetch(`${API_BASE}/users`);
+        }
+        
         if (!response.ok) throw new Error('Failed to load users');
         
         users = await response.json();
@@ -115,7 +131,7 @@ function renderUsers() {
         const initials = getInitials(fullName);
         
         userCard.innerHTML = `
-            ${getStatusBadge(user.id)}
+            ${getStatusBadge(user)}
             <div class="user-header">
                 <div class="user-avatar">
                     ${user.photoUrl ? 
@@ -350,9 +366,16 @@ function renderMyReviews(reviews) {
     container.innerHTML = profileCard + reviewsHtml;
 }
 
-// Get status badge for user - no longer showing badges since multiple reviews are allowed
-function getStatusBadge(userId) {
-    return ''; // No status badges needed
+// Get status badge for user - show indicators for review status
+function getStatusBadge(user) {
+    if (!currentUser || user.isCurrentUser) return '';
+    
+    // Показываем красный кружочек, если пользователь НЕ оставлял отзыв
+    if (user.hasReviewFromCurrentUser === false) {
+        return '<div class="status-badge status-pending">!</div>';
+    }
+    
+    return ''; // Ничего не показываем, если отзыв уже есть
 }
 
 // Open user modal
@@ -471,6 +494,9 @@ async function submitReview(event) {
         
         // Reload reviews for the user
         await loadUserReviews(selectedUserId);
+        
+        // Reload users list to update badges and sorting
+        await loadUsers();
         
         userModal.style.display = 'block';
         

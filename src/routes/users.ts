@@ -5,7 +5,81 @@ import { validateTelegramWebAppData } from '../utils/telegram';
 export function userRoutes(prisma: PrismaClient) {
   const router = Router();
 
-  // Получить всех пользователей
+  // Получить всех пользователей с информацией о статусе отзывов
+  router.post('/with-status', async (req, res) => {
+    try {
+      const { telegramData } = req.body;
+      
+      if (!telegramData) {
+        return res.status(400).json({ error: 'Telegram data required' });
+      }
+
+      // Валидация данных от Telegram
+      const userData = validateTelegramWebAppData(telegramData);
+      let currentUserId = null;
+      
+      if (userData) {
+        try {
+          const currentUser = await prisma.user.findUnique({
+            where: { telegramId: BigInt(userData.id) }
+          });
+          currentUserId = currentUser?.id;
+        } catch (error) {
+          console.log('Could not find current user:', error);
+        }
+      }
+
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          username: true,
+          firstName: true,
+          lastName: true,
+          photoUrl: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      });
+
+      // Если есть текущий пользователь, получаем информацию о его отзывах
+      let usersWithStatus = users;
+      if (currentUserId) {
+        const reviewedUserIds = await prisma.review.findMany({
+          where: { authorId: currentUserId },
+          select: { targetId: true },
+          distinct: ['targetId']
+        });
+        
+        const reviewedIds = new Set(reviewedUserIds.map(r => r.targetId));
+        
+        usersWithStatus = users.map(user => ({
+          ...user,
+          hasReviewFromCurrentUser: reviewedIds.has(user.id),
+          isCurrentUser: user.id === currentUserId
+        })).sort((a, b) => {
+          // Исключаем текущего пользователя из сортировки
+          if (a.isCurrentUser) return -1;
+          if (b.isCurrentUser) return 1;
+          
+          // Сортируем: сначала те, кому НЕ писали отзывы, потом те, кому писали
+          if (!a.hasReviewFromCurrentUser && b.hasReviewFromCurrentUser) return -1;
+          if (a.hasReviewFromCurrentUser && !b.hasReviewFromCurrentUser) return 1;
+          
+          // В рамках группы сортируем по дате создания (новые первые)
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+      }
+
+      res.json(usersWithStatus);
+    } catch (error) {
+      console.error('Error fetching users with status:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Получить всех пользователей (старый endpoint для совместимости)
   router.get('/', async (req, res) => {
     try {
       const users = await prisma.user.findMany({
