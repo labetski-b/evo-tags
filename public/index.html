@@ -577,44 +577,15 @@
         }
         
         .modal-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem 1.5rem;
-            padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+            padding: 1rem 1.5rem 1.5rem;
             border-top: 1px solid var(--tg-theme-section-separator-color, rgba(0, 0, 0, 0.05));
             background: var(--tg-theme-bg-color, #ffffff);
-            backdrop-filter: blur(20px);
-            z-index: 10000;
-            transform: translateY(0);
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        
-        .modal-footer.keyboard-visible {
-            transform: translateY(calc(-1 * var(--keyboard-height, 0px)));
+            flex-shrink: 0;
         }
         
         .btn-full-width {
             width: 100%;
             max-width: none;
-            background: linear-gradient(135deg, #007AFF, #5856D6);
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            padding: 0.875rem 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-            transition: all 0.2s ease;
-        }
-        
-        .btn-full-width:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-        }
-        
-        .btn-full-width:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 4px rgba(0, 122, 255, 0.2);
         }
         
         .close {
