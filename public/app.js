@@ -608,6 +608,7 @@ function handleKeyboardVisibility() {
         const keyboardThreshold = fullHeight * 0.7; // Keyboard likely open if viewport < 70% of screen
         
         const isKeyboardOpen = currentHeight < keyboardThreshold;
+        const keyboardHeight = isKeyboardOpen ? (fullHeight - currentHeight) : 0;
         
         if (isKeyboardOpen !== keyboardOpen) {
             keyboardOpen = isKeyboardOpen;
@@ -620,6 +621,17 @@ function handleKeyboardVisibility() {
                     modal.classList.remove('keyboard-open');
                 }
             });
+            
+            // Управляем кнопкой в футере
+            const modalFooter = document.querySelector('.modal-footer');
+            if (modalFooter) {
+                if (isKeyboardOpen) {
+                    document.documentElement.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
+                    modalFooter.classList.add('keyboard-visible');
+                } else {
+                    modalFooter.classList.remove('keyboard-visible');
+                }
+            }
             
             // Scroll focused input into view when keyboard opens
             if (isKeyboardOpen) {
