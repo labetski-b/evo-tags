@@ -329,6 +329,16 @@ function renderMyReviews(reviews) {
     
     if (reviews.length === 0) {
         container.innerHTML = `
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    ${currentUser?.photoUrl ? 
+                        `<img src="${currentUser.photoUrl}" alt="${currentUser.firstName || 'Вы'}">` : 
+                        getInitials([currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Вы')
+                    }
+                </div>
+                <div class="profile-name">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Ваш профиль'}</div>
+                <div class="profile-stats">0 отзывов</div>
+            </div>
             <div class="empty-state">
                 <h3>🌟 Пока нет отзывов</h3>
                 <p>Когда коллеги оставят отзывы о вас, они появятся здесь</p>
@@ -337,21 +347,22 @@ function renderMyReviews(reviews) {
         return;
     }
     
-    container.innerHTML = reviews.map(review => `
-        <div class="feed-item">
-            <div class="feed-header">
-                <div class="feed-avatar">
-                    ${currentUser?.photoUrl ? 
-                        `<img src="${currentUser.photoUrl}" alt="${currentUser.firstName || 'Вы'}">` : 
-                        getInitials([currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Вы')
-                    }
-                </div>
-                <div class="feed-info">
-                    <div class="feed-names">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Вы'}</div>
-                    <div class="feed-context">получили новый отзыв</div>
-                </div>
+    // Profile card + reviews
+    const profileCard = `
+        <div class="profile-card">
+            <div class="profile-avatar">
+                ${currentUser?.photoUrl ? 
+                    `<img src="${currentUser.photoUrl}" alt="${currentUser.firstName || 'Вы'}">` : 
+                    getInitials([currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Вы')
+                }
             </div>
-            
+            <div class="profile-name">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Ваш профиль'}</div>
+            <div class="profile-stats">${reviews.length} ${getReviewsWordForm(reviews.length)}</div>
+        </div>
+    `;
+    
+    const reviewsHtml = reviews.map(review => `
+        <div class="feed-item">
             <div class="feed-content">
                 <div class="feed-type">💡 Таланты и компетенции</div>
                 <div>${review.talentsAnswer}</div>
@@ -361,8 +372,18 @@ function renderMyReviews(reviews) {
                 <div class="feed-type">🎯 Подходящие клиенты</div>
                 <div>${review.clientAnswer}</div>
             </div>
+            
+            <div class="review-date-only">
+                ${new Date(review.createdAt).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                })}
+            </div>
         </div>
     `).join('');
+    
+    container.innerHTML = profileCard + reviewsHtml;
 }
 
 // Get status badge for user
@@ -681,6 +702,17 @@ function initModalTabs() {
 
 // Initialize modal tabs when DOM is loaded
 initModalTabs();
+
+// Helper function for correct Russian word forms
+function getReviewsWordForm(count) {
+    if (count % 10 === 1 && count % 100 !== 11) {
+        return 'отзыв';
+    } else if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) {
+        return 'отзыва';
+    } else {
+        return 'отзывов';
+    }
+}
 
 // Load feed
 async function loadFeed() {
