@@ -63,6 +63,18 @@ export function userRoutes(prisma: PrismaClient) {
                     }
                   }
                 }
+              },
+              authoredReviews: {
+                select: {
+                  id: true,
+                  createdAt: true,
+                  target: {
+                    select: {
+                      firstName: true,
+                      lastName: true
+                    }
+                  }
+                }
               }
             }
           });
@@ -114,6 +126,21 @@ export function userRoutes(prisma: PrismaClient) {
                 clientAnswer: true,
                 createdAt: true,
                 author: {
+                  select: {
+                    firstName: true,
+                    lastName: true
+                  }
+                }
+              },
+              orderBy: {
+                createdAt: 'desc'
+              }
+            },
+            authoredReviews: {
+              select: {
+                id: true,
+                createdAt: true,
+                target: {
                   select: {
                     firstName: true,
                     lastName: true

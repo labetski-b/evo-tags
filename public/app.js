@@ -278,6 +278,9 @@ async function loadMyReviews() {
 function renderMyReviews(reviews) {
     const container = document.getElementById('myReviewsContainer');
     
+    const receivedCount = reviews.length;
+    const authoredCount = currentUser?.authoredReviews?.length || 0;
+    
     if (reviews.length === 0) {
         container.innerHTML = `
             <div class="profile-card">
@@ -289,7 +292,10 @@ function renderMyReviews(reviews) {
                 </div>
                 <div class="profile-info">
                     <div class="profile-name">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Ваш профиль'}</div>
-                    <div class="profile-stats">0 отзывов</div>
+                    <div class="profile-stats">
+                        <div>Получено: 0 отзывов</div>
+                        <div>Написано: ${authoredCount} ${getReviewsWordForm(authoredCount)}</div>
+                    </div>
                 </div>
             </div>
             <div class="empty-state">
@@ -311,7 +317,10 @@ function renderMyReviews(reviews) {
             </div>
             <div class="profile-info">
                 <div class="profile-name">${[currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Ваш профиль'}</div>
-                <div class="profile-stats">${reviews.length} ${getReviewsWordForm(reviews.length)}</div>
+                <div class="profile-stats">
+                    <div>Получено: ${receivedCount} ${getReviewsWordForm(receivedCount)}</div>
+                    <div>Написано: ${authoredCount} ${getReviewsWordForm(authoredCount)}</div>
+                </div>
             </div>
         </div>
     `;
