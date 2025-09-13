@@ -420,13 +420,6 @@ function renderReviews(reviews) {
     talentsContainer.innerHTML = reviews.map(review => `
         <div class="review-block">
             <div class="review-content">${review.talentsAnswer}</div>
-            <div class="review-meta">
-                <span class="review-author">Анонимно</span>
-                <span class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU', {
-                    day: 'numeric',
-                    month: 'short'
-                })}</span>
-            </div>
         </div>
     `).join('');
     
@@ -434,13 +427,6 @@ function renderReviews(reviews) {
     clientsContainer.innerHTML = reviews.map(review => `
         <div class="review-block">
             <div class="review-content">${review.clientAnswer}</div>
-            <div class="review-meta">
-                <span class="review-author">Анонимно</span>
-                <span class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU', {
-                    day: 'numeric',
-                    month: 'short'
-                })}</span>
-            </div>
         </div>
     `).join('');
 }
