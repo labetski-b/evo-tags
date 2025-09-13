@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { validateTelegramWebAppData } from '../utils/telegram';
+import { sendReviewNotification } from '../bot/bot';
 
 export function reviewRoutes(prisma: PrismaClient) {
   const router = Router();
@@ -57,6 +58,15 @@ export function reviewRoutes(prisma: PrismaClient) {
           }
         });
         
+        // Отправляем уведомление получателю отзыва
+        try {
+          const authorName = [author.firstName, author.lastName].filter(Boolean).join(' ') || 'Анонимный пользователь';
+          await sendReviewNotification(target.telegramId, authorName, talentsAnswer);
+        } catch (notificationError) {
+          console.error('Failed to send notification:', notificationError);
+          // Не прерываем процесс, если уведомление не отправилось
+        }
+
         res.json({ 
           success: true, 
           reviewId: reviewResult.id,
@@ -76,6 +86,15 @@ export function reviewRoutes(prisma: PrismaClient) {
               clientAnswer
             }
           });
+          
+          // Отправляем уведомление получателю отзыва (для обновленного отзыва)
+          try {
+            const authorName = [author.firstName, author.lastName].filter(Boolean).join(' ') || 'Анонимный пользователь';
+            await sendReviewNotification(target.telegramId, authorName, talentsAnswer);
+          } catch (notificationError) {
+            console.error('Failed to send notification:', notificationError);
+            // Не прерываем процесс, если уведомление не отправилось
+          }
           
           res.json({ 
             success: true, 

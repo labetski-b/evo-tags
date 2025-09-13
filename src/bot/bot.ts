@@ -105,4 +105,45 @@ export function initBot(prisma: PrismaClient) {
   console.log('🤖 Telegram bot started');
 }
 
+// Функция для отправки уведомления о новом отзыве
+export async function sendReviewNotification(
+  targetTelegramId: bigint, 
+  authorName: string,
+  reviewPreview: string
+) {
+  if (!bot) {
+    console.error('Bot not initialized');
+    return;
+  }
+
+  try {
+    const targetUserId = Number(targetTelegramId);
+    
+    const message = `🌟 Вы получили новый отзыв!
+
+👤 От: ${authorName}
+
+📝 "${reviewPreview.substring(0, 100)}${reviewPreview.length > 100 ? '...' : ''}"
+
+Откройте приложение, чтобы прочитать полный отзыв:`;
+
+    await bot.sendMessage(targetUserId, message, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: '📖 Открыть EVO Tags',
+              web_app: { url: webappUrl! }
+            }
+          ]
+        ]
+      }
+    });
+
+    console.log(`✅ Review notification sent to user ${targetUserId}`);
+  } catch (error) {
+    console.error('Error sending review notification:', error);
+  }
+}
+
 export { bot };
