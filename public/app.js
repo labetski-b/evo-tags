@@ -374,6 +374,7 @@ async function openUserModal(user) {
         showLoading(true);
         await loadUserReviews(user.id);
         userModal.style.display = 'block';
+        hideNavigation();
         showLoading(false);
     } catch (error) {
         console.error('Error loading user reviews:', error);
@@ -514,21 +515,38 @@ async function submitReview(event) {
     }
 }
 
+// Navigation control functions
+function hideNavigation() {
+    const navTabs = document.querySelector('.nav-tabs');
+    navTabs.classList.add('hidden');
+}
+
+function showNavigation() {
+    const navTabs = document.querySelector('.nav-tabs');
+    navTabs.classList.remove('hidden');
+}
+
 // Event listeners
 document.getElementById('closeModal').onclick = () => {
     userModal.style.display = 'none';
+    showNavigation();
 };
 
-document.getElementById('writeReviewBtn').onclick = openReviewModal;
+document.getElementById('writeReviewBtn').onclick = () => {
+    hideNavigation();
+    openReviewModal();
+};
 
 document.getElementById('closeReviewModal').onclick = () => {
     reviewModal.style.display = 'none';
     userModal.style.display = 'block';
+    showNavigation();
 };
 
 document.getElementById('cancelReview').onclick = () => {
     reviewModal.style.display = 'none';
     userModal.style.display = 'block';
+    showNavigation();
 };
 
 document.getElementById('reviewForm').onsubmit = submitReview;
@@ -537,10 +555,12 @@ document.getElementById('reviewForm').onsubmit = submitReview;
 window.onclick = (event) => {
     if (event.target === userModal) {
         userModal.style.display = 'none';
+        showNavigation();
     }
     if (event.target === reviewModal) {
         reviewModal.style.display = 'none';
         userModal.style.display = 'block';
+        showNavigation();
     }
 };
 
