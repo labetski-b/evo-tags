@@ -56,6 +56,12 @@ export function userRoutes(prisma: PrismaClient) {
                   talentsAnswer: true,
                   clientAnswer: true,
                   createdAt: true,
+                  author: {
+                    select: {
+                      firstName: true,
+                      lastName: true
+                    }
+                  }
                 }
               }
             }
@@ -69,7 +75,8 @@ export function userRoutes(prisma: PrismaClient) {
           return res.status(404).json({ error: 'No users found' });
         } catch (fallbackError) {
           console.error('Fallback also failed:', fallbackError);
-          return res.status(500).json({ error: 'Database connection failed' });
+          const errorDetails = fallbackError instanceof Error ? fallbackError.message : 'Unknown error';
+          return res.status(500).json({ error: 'Database connection failed', details: errorDetails });
         }
       }
 
@@ -77,13 +84,21 @@ export function userRoutes(prisma: PrismaClient) {
       
       try {
         // Проверяем, что ID это число
-        if (!userData.id || isNaN(Number(userData.id))) {
-          console.error('Invalid user ID:', userData.id);
-          return res.status(400).json({ error: 'Invalid user ID' });
+        if (!userData.id) {
+          console.error('No user ID provided:', userData.id);
+          return res.status(400).json({ error: 'No user ID provided' });
+        }
+
+        let telegramId;
+        try {
+          telegramId = BigInt(userData.id);
+        } catch (bigIntError) {
+          console.error('Invalid user ID for BigInt conversion:', userData.id, bigIntError);
+          return res.status(400).json({ error: 'Invalid user ID format' });
         }
 
         const user = await prisma.user.findUnique({
-          where: { telegramId: BigInt(userData.id) },
+          where: { telegramId },
           include: {
             receivedReviews: {
               select: {
@@ -91,6 +106,15 @@ export function userRoutes(prisma: PrismaClient) {
                 talentsAnswer: true,
                 clientAnswer: true,
                 createdAt: true,
+                author: {
+                  select: {
+                    firstName: true,
+                    lastName: true
+                  }
+                }
+              },
+              orderBy: {
+                createdAt: 'desc'
               }
             }
           }

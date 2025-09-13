@@ -10,7 +10,12 @@ interface TelegramUser {
 
 export function validateTelegramWebAppData(telegramData: string): TelegramUser | null {
   try {
-    console.log('Validating Telegram data:', telegramData.substring(0, 100) + '...');
+    console.log('Validating Telegram data:', telegramData ? telegramData.substring(0, 100) + '...' : 'empty');
+    
+    if (!telegramData || telegramData.trim() === '') {
+      console.error('Empty or null Telegram data provided');
+      return null;
+    }
     
     // В реальном приложении нужно валидировать подпись
     // Для упрощения пока просто парсим данные
@@ -24,12 +29,26 @@ export function validateTelegramWebAppData(telegramData: string): TelegramUser |
       return null;
     }
 
-    const user = JSON.parse(decodeURIComponent(userParam));
+    let user;
+    try {
+      user = JSON.parse(decodeURIComponent(userParam));
+    } catch (parseError) {
+      console.error('Failed to parse user data JSON:', parseError);
+      console.error('User param was:', userParam);
+      return null;
+    }
+    
     console.log('Parsed user data:', user);
     
     // Базовая валидация структуры пользователя
     if (!user.id || !user.first_name) {
-      console.error('Invalid user data structure:', user);
+      console.error('Invalid user data structure - missing id or first_name:', user);
+      return null;
+    }
+
+    // Проверяем, что ID можно конвертировать в число
+    if (isNaN(Number(user.id))) {
+      console.error('User ID is not a valid number:', user.id);
       return null;
     }
 
