@@ -109,7 +109,8 @@ export function userRoutes(prisma: PrismaClient) {
       }
     } catch (error) {
       console.error('Error fetching current user:', error);
-      res.status(500).json({ error: 'Internal server error', details: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ error: 'Internal server error', details: errorMessage });
     }
   });
 
