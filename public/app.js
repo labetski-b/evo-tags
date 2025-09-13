@@ -130,6 +130,8 @@ function renderUsers() {
         const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
         const initials = getInitials(fullName);
         
+        const reviewsCount = user._count?.receivedReviews || 0;
+        
         userCard.innerHTML = `
             ${getStatusBadge(user)}
             <div class="user-header">
@@ -142,6 +144,7 @@ function renderUsers() {
                 </div>
                 <div class="user-info">
                     <h3>${fullName}</h3>
+                    <div class="user-reviews-count">${reviewsCount} ${getReviewsWordForm(reviewsCount)}</div>
                 </div>
             </div>
         `;
@@ -372,7 +375,7 @@ function getStatusBadge(user) {
     
     // Показываем красный кружочек, если пользователь НЕ оставлял отзыв
     if (user.hasReviewFromCurrentUser === false) {
-        return '<div class="status-badge status-pending">!</div>';
+        return '<div class="status-badge status-pending"></div>';
     }
     
     return ''; // Ничего не показываем, если отзыв уже есть

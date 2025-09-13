@@ -37,6 +37,11 @@ export function userRoutes(prisma: PrismaClient) {
           lastName: true,
           photoUrl: true,
           createdAt: true,
+          _count: {
+            select: {
+              receivedReviews: true
+            }
+          }
         },
         orderBy: {
           createdAt: 'desc'
@@ -59,9 +64,9 @@ export function userRoutes(prisma: PrismaClient) {
           hasReviewFromCurrentUser: reviewedIds.has(user.id),
           isCurrentUser: user.id === currentUserId
         })).sort((a, b) => {
-          // Исключаем текущего пользователя из сортировки
-          if (a.isCurrentUser) return -1;
-          if (b.isCurrentUser) return 1;
+          // Помещаем текущего пользователя в конец списка
+          if (a.isCurrentUser) return 1;
+          if (b.isCurrentUser) return -1;
           
           // Сортируем: сначала те, кому НЕ писали отзывы, потом те, кому писали
           if (!a.hasReviewFromCurrentUser && b.hasReviewFromCurrentUser) return -1;
@@ -90,6 +95,11 @@ export function userRoutes(prisma: PrismaClient) {
           lastName: true,
           photoUrl: true,
           createdAt: true,
+          _count: {
+            select: {
+              receivedReviews: true
+            }
+          }
         },
         orderBy: {
           createdAt: 'desc'
