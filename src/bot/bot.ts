@@ -119,9 +119,7 @@ export async function sendReviewNotification(
   try {
     const targetUserId = Number(targetTelegramId);
     
-    const message = `🌟 Вы получили новый отзыв!
-
-👤 От: ${authorName}
+    const message = `🌟 Вы получили новый анонимный отзыв!
 
 📝 "${reviewPreview.substring(0, 100)}${reviewPreview.length > 100 ? '...' : ''}"
 
