@@ -53,6 +53,22 @@ export function reviewRoutes(prisma: PrismaClient) {
           talentsAnswer,
           clientAnswer
         }
+      }).catch(async (error) => {
+        // Если все еще есть уникальное ограничение, попробуем обновить существующий отзыв
+        if (error.code === 'P2002') {
+          console.log('Unique constraint still exists, falling back to update');
+          return await prisma.review.updateMany({
+            where: {
+              authorId: author.id,
+              targetId: targetUserId
+            },
+            data: {
+              talentsAnswer,
+              clientAnswer
+            }
+          });
+        }
+        throw error;
       });
 
       res.json({ 
