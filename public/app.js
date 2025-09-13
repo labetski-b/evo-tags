@@ -1,6 +1,17 @@
 // Telegram Web App initialization
 const tg = window.Telegram.WebApp;
+
+// Развернуть приложение на весь экран
 tg.expand();
+
+// Дополнительные настройки для полного экрана
+tg.enableClosingConfirmation();
+tg.disableVerticalSwipes();
+
+// Настройка цветов под Telegram
+if (tg.themeParams) {
+    document.documentElement.style.setProperty('--tg-color-scheme', tg.colorScheme);
+}
 
 // Global state
 let currentUser = null;
